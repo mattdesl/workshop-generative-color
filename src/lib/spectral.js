@@ -1,3 +1,6 @@
+// ES Module Version of spectral.js from:
+// https://github.com/rvanwijnen/spectral.js
+
 // K1 and K2 are used for the Saunderson correction which is used for how the color looks behind a refractive
 // surface like glass
 //

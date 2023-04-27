@@ -1,12 +1,13 @@
-// Exercise: Apply a procedural to an artwork
+// Exercise: Apply a procedural palette to an artwork
 
-import Color from "https://colorjs.io/dist/color.js";
+import { Color } from "../lib/color.js";
 import * as random from "../lib/random.js";
-import { visualize } from "../lib/test.js";
+
 import sketch from "../lib/sketches/grid.js";
+import { visualize } from "../lib/test.js";
 
 // create our color palette
-const palette = [];
+let palette = [];
 
 // choose random hue
 const hue = random.range(0, 360);

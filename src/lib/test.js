@@ -1,4 +1,5 @@
 import { Color, colorToStyle } from "./color.js";
+
 import * as random from "./random.js";
 import canvasSketch from "https://cdn.jsdelivr.net/npm/canvas-sketch@0.7.7/dist/canvas-sketch.m.js";
 import { attachDownloadKeyCommand, loadImage, resizePixels } from "./util.js";

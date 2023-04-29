@@ -237,7 +237,7 @@ export function sRGBToSpectrum(sRGB) {
   const g = sRGB[1] / 0xff;
   const b = sRGB[2] / 0xff;
 
-  // // in 0..1 range
+  // in 0..1 range
   for (var i = 0; i < WAVELENGTH_COUNT; ++i) {
     const xyz = DATA.basis[i];
     spec[i] = xyz[0] * r + xyz[1] * g + xyz[2] * b;

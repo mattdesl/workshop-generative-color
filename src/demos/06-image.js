@@ -1,6 +1,6 @@
 // Exercise: Use color science to process images
 
-import Color from "https://colorjs.io/dist/color.js";
+import { Color, colorToStyle } from "../lib/color.js";
 import { imagePixels } from "../lib/test.js";
 import * as random from "../lib/random.js";
 import { mapRange } from "../lib/math.js";

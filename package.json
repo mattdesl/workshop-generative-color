@@ -2,6 +2,7 @@
   "name": "workshop-generative-color",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "vendor": "esbuild color-space --format=cjs --bundle --outfile=sketches/vendor/color-space.js --sourcemap=inline --minify"

@@ -10,8 +10,13 @@ export const setSeed = (hash, print = true) => {
   _seed = hash;
   _nextGaussian = null;
   _hasNextGaussian = false;
+  let c = 1;
+  const orig = hash;
+  while (hash.length < 64) {
+    hash += orig[c++ % orig.length];
+  }
   S = Uint32Array.from(
-    [0, 1, (s = t = 2), 3].map((i) => parseInt(hash.substr(i * 8 + 2, 8), 16))
+    [0, 1, (s = t = 2), 3].map((i) => parseInt(hash.substr(i * 8 + 0, 8), 16))
   );
   R = (_) => (
     (t = S[3]),
@@ -40,12 +45,18 @@ export const range = (min, max) => {
   return value() * (max - min) + min;
 };
 
-export const rangeFloor = (min, max) => Math.floor(range(min, max));
+export const rangeFloor = (min, max) => {
+  if (max == null) {
+    max = min;
+    min = 0;
+  }
+  return Math.floor(range(min, max));
+};
 
 export const pick = (array) =>
-  array.length ? array[rangeFloor(array.length)] : undefined;
+  array.length ? array[rangeFloor(0, array.length)] : undefined;
 
-export const pickargs = (...args) => args[rangeFloor(args.length)];
+export const pickargs = (...args) => args[rangeFloor(0, args.length)];
 
 export const shuffle = (arr) => {
   var rand;
@@ -60,20 +71,6 @@ export const shuffle = (arr) => {
   }
   return ret;
 };
-
-// export const shuffleRaw = (arr) => {
-//   var rand;
-//   var tmp;
-//   var len = arr.length;
-//   var ret = [...arr];
-//   while (len) {
-//     rand = ~~(Math.random() * len--);
-//     tmp = ret[len];
-//     ret[len] = ret[rand];
-//     ret[rand] = tmp;
-//   }
-//   return ret;
-// };
 
 export const insideCircle = (radius = 1, out = []) => {
   var theta = value() * 2.0 * Math.PI;

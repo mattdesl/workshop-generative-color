@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>sketch</title>
+    <title>{{title}}</title>
     <meta
       name="viewport"
       content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
@@ -16,6 +16,7 @@
       }
 
       body {
+        font: 14px monospace;
         width: 100%;
         height: 100%;
         display: flex;
@@ -25,19 +26,29 @@
         margin: 0;
       }
 
-      a, a:visited, a:active {
-        color: blue;
-      }
-
       canvas {
         margin: auto;
         display: block;
         box-shadow: 0px 2px 12px -2px rgba(0, 0, 0, 0.15);
       }
+
+      a, a:visited, a:active {
+        color: blue;
+      }
+
+      .breadcrumb {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+      }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/error-help@1.0.9/error-help.js"></script>
+    <script src="/livereload.js" type="module"></script>
+    <script src="/lib/vendor/error-help.js"></script>
   </head>
   <body>
-    <script type="module" src="demos/06-image.js"></script>
+    <nav class="breadcrumb">
+      <a href="/">sketches</a> / {{title}}
+    </nav>
+    <script type="module" src="{{src}}"></script>
   </body>
 </html>

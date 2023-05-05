@@ -1,195 +1,109 @@
-import { Application, Router } from "https://deno.land/x/oak@v12.1.0/mod.ts";
-import * as path from "https://deno.land/std@0.181.0/path/mod.ts";
-import list from "./list.js";
+import { App } from "@tinyhttp/app";
+import sirv from "sirv";
+import * as http from "http";
+import WebSocket from "ws";
 
-const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
+export const LIVE_RELOAD_API = "/livereload";
+export const LIVE_RELOAD_SRC = "/livereload.js";
 
-const liveReloadFile = path.fromFileUrl(
-  import.meta.resolve("./client/livereload.js")
-);
-const liveReloadSrc = Deno.readTextFileSync(liveReloadFile);
+const WebSocketServer = WebSocket.Server;
 
-const htmlIndexSrcRaw = /* html */ `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>color-workshop</title>
-    <script src="/livereload.js" type="module"></script>
-  </head>
-  <body>
-    <div>hi</div>
-  </body>
-</html>`;
-
-export default function startServer(opts = {}) {
-  const {
-    port = 9966,
-    middleware,
-    rootDir = Deno.cwd(),
-    entryDir = Deno.cwd(),
-  } = opts;
-
-  const buildEntryPoints = [];
-  const htmlIndexSrc = htmlIndexSrcRaw.replace(
-    "{{entryPoints}}",
-    buildEntryPoints.map((src) => {
-      return `<script src=${JSON.stringify(src)} type="module"></script>`;
-    })
-  );
-
-  const app = new Application();
-  const router = new Router();
-  const clients = new Set();
-
-  router.get("/favicon.ico", (ctx) => {
-    ctx.response.type = "text/html";
-    ctx.response.status = 200;
-    ctx.response.body = htmlIndexSrc;
-  });
-  router.get("/livereload.js", (ctx) => {
-    ctx.response.type = "text/javascript";
-    ctx.response.status = 200;
-    ctx.response.body = liveReloadSrc;
-  });
-  // router.get("/", (ctx) => {
-  //   ctx.response.type = "text/html";
-  //   ctx.response.status = 200;
-  //   ctx.response.body = htmlIndexSrc;
-  // });
-  router.get("/livereload", (ctx) => {
-    if (!ctx.isUpgradable) {
-      ctx.throw(501);
-    }
-    const socket = ctx.upgrade();
-    socket.onopen = () => {
-      // console.log("[sasho-server] connected");
-      clients.add(socket);
-      socket.send(JSON.stringify({ event: "connect" }));
-    };
+const liveReloadClient = `window.onload = () => {
+  let socket;
+  retry();
+  function retry() {
+    const uri = "ws://" + window.location.host + "/livereload";
+    socket = new WebSocket(uri);
     socket.onmessage = (m) => {
-      // console.log("message from client", m);
-      socket.send(m.data);
+      let evt;
+      try {
+        evt = JSON.parse(m.data);
+      } catch (err) {
+        return console.error(err);
+      }
+      if (evt.event === "reload") location.reload();
     };
     socket.onclose = () => {
-      // console.log("[sasho-server] closed");
-      clients.delete(socket);
+      setTimeout(retry, 1000);
     };
-  });
+    return socket;
+  }
+};`;
 
-  const sendSketch = (edit) => {
-    return (ctx) => {
-      let srcFile = path.resolve(
-        entryDir,
-        decodeURIComponent(
-          ctx.request.url.pathname.replace(/^\/(view|edit)\//i, "/sketches/")
-        )
-      );
-      if (!path.extname(srcFile)) srcFile = srcFile + ".js";
-      try {
-        const fpath = path.resolve(
-          __dirname,
-          `client/${edit ? "edit" : "sketch"}.html`
-        );
-        const jsFile = path.basename(srcFile);
-        const txt = Deno.readTextFileSync(fpath);
-        const src = encodeURI(srcFile);
+const tinyws =
+  (wsOptions, wss = new WebSocketServer({ ...wsOptions, noServer: true })) =>
+  async (req, _, next) => {
+    const upgradeHeader = (req.headers.upgrade || "")
+      .split(",")
+      .map((s) => s.trim());
 
-        // try to stat the file
-        Deno.statSync("." + srcFile);
-
-        ctx.response.type = "text/html; charset=utf-8";
-        ctx.response.status = 200;
-        ctx.response.body = txt
-          .replaceAll("{{title}}", jsFile)
-          .replaceAll("{{src}}", src)
-          .replaceAll(
-            "{{srcView}}",
-            encodeURI(`/view/${path.basename(jsFile)}`)
-          );
-      } catch (err) {
-        console.error(err);
-        const url = src;
-        ctx.response.type = "text/html; charset=utf-8";
-        ctx.response.status = 404;
-        ctx.response.body = `<body style="font-family: monospace; padding: 20px; font-size: 14px; color: #e31919;">404 resource not found: ${url}</body>`;
-      }
-    };
+    // When upgrade header contains "websocket" it's index is 0
+    if (upgradeHeader.indexOf("websocket") === 0) {
+      req.ws = () =>
+        new Promise((resolve) => {
+          wss.handleUpgrade(req, req.socket, Buffer.alloc(0), (ws) => {
+            wss.emit("connection", ws, req);
+            resolve(ws);
+          });
+        });
+    }
+    await next();
   };
 
-  router.redirect("/view", "/");
-  // router.post("/_edit/change", async (ctx) => {
-  //   const body = await ctx.request.body({ type: "json" });
-  //   const d = await body.value;
-  //   if (d && d.code != null) {
-  //     const f = path.resolve(rootDir, "." + d.src);
-  //     console.log("write", f);
-  //     await Deno.writeTextFile(f, d.code);
-  //   }
+export async function createServer(opts = {}) {
+  const { serveDir = process.cwd(), middleware } = opts;
 
-  //   ctx.response.status = 200;
-  //   ctx.response.type = ".json";
-  //   ctx.response.body = JSON.stringify({ ok: true });
-  // });
-  router.get("/", list({ title: "view", entryDir }));
-  router.get(/^\/view\/*/i, sendSketch(false));
-  // router.get(/^\/edit\/*/i, sendSketch(true));
-  app.use(router.routes());
-  app.use(router.allowedMethods());
-
+  const clients = new Set();
+  const app = new App({
+    onError: (err, req, res) => {
+      res
+        .status(500)
+        .type("html")
+        .end(
+          `<body style="font-family: monospace; padding: 20px; font-size: 14px; color: #e31919;"><pre style="white-space: pre-wrap;">Server responded with error code 500\n${
+            err.stack || err.message
+          }</pre></body>`
+        );
+    },
+    noMatchHandler: (req, res) => {
+      const { url } = req;
+      res
+        .status(404)
+        .type("html")
+        .end(
+          `<body style="font-family: monospace; padding: 20px; font-size: 14px; color: #e31919;"><pre style="white-space: pre-wrap;">404 resource not found: ${url}</pre></body>`
+        );
+    },
+  });
+  app.use(tinyws());
+  app.use(LIVE_RELOAD_API, async (req, res) => {
+    if (req.ws) {
+      const socket = await req.ws();
+      clients.add(socket);
+      socket.send(JSON.stringify({ event: "connect" }));
+      socket.onmessage = (m) => {
+        socket.send(m.data);
+      };
+      socket.on("close", () => {
+        clients.delete(socket);
+      });
+    } else {
+      res.send(
+        `${LIVE_RELOAD_API} should be accessed from websocket request, not HTTP`
+      );
+    }
+  });
+  app.use(LIVE_RELOAD_SRC, async (req, res) => {
+    res.status(200).type("js").send(liveReloadClient);
+  });
   if (middleware) {
     app.use(middleware);
   }
-
-  // app.use(async (ctx, next) => {
-  //   try {
-  //     return await ctx.send({
-  //       root: rootDir,
-  //       index: "index.html",
-  //     });
-  //   } catch (err) {
-  //     console.error("Error sending static content:", err.message);
-  //     return await next(err);
-  //   }
-  // });
-
-  app.use(async (ctx) => {
-    const url = ctx.request.url;
-    const filepath = decodeURIComponent(url.pathname);
-
-    // Try opening the file
-    let file;
-    try {
-      file = await Deno.open(rootDir + filepath, { read: true });
-    } catch (err) {
-      console.error("Error reading file", err);
-      // If the file cannot be opened, return a "404 Not Found" response
-      // ctx.response.type = "text/html; charset=utf-8";
-      ctx.response.status = 404;
-      // ctx.response.body = `<body style="font-family: monospace; padding: 20px; font-size: 14px; color: #e31919;">404 resource not found: ${url}</body>`;
-      throw err;
-      // return await next();
-    }
-
-    // Build a readable stream so the file doesn't have to be fully loaded into
-    // memory while we send it
-    const readableStream = file.readable;
-    ctx.response.type = path.extname(filepath);
-    ctx.response.status = 200;
-    ctx.response.body = readableStream;
-  });
-
-  app.use((ctx) => {
-    console.error("got error handler");
-    const url = ctx.request.url.pathname;
-    ctx.response.type = "text/html; charset=utf-8";
-    ctx.response.status = 404;
-    ctx.response.body = `<body style="font-family: monospace; padding: 20px; font-size: 14px; color: #e31919;">404 resource not found: ${url}</body>`;
-  });
-
-  app.addEventListener("listen", () => {
-    console.log(`Listening on http://localhost:${port}/`);
-  });
+  app.use(
+    sirv(serveDir, {
+      dev: true,
+    })
+  );
 
   return {
     reload() {
@@ -206,8 +120,25 @@ export default function startServer(opts = {}) {
         }
       });
     },
-    listen() {
-      return app.listen({ port });
+    listen(port = 3000, host = undefined) {
+      return new Promise((resolve, reject) => {
+        const noop = () => {};
+        try {
+          const server = http
+            .createServer()
+            .on("request", app.attach)
+            .once("error", (err) => {
+              reject(err);
+              reject = resolve = noop;
+            })
+            .listen(port, host, () => {
+              resolve(server);
+              reject = resolve = noop;
+            });
+        } catch (err) {
+          reject(err);
+        }
+      });
     },
   };
 }

@@ -7,9 +7,7 @@ import * as random from "../lib/random.js";
 import { lerpArray, mapRange } from "../lib/math.js";
 import { createCanvas } from "../lib/util.js";
 import * as spectra from "../lib/spectra/spectra.js";
-import { xyz2rgb, rgb2xyz } from "../lib/spectra/xyz.js";
 import macbeth from "../lib/spectra/macbeth.js";
-import { mix as spectralJSMix } from "../lib/spectral.js";
 
 const width = 1024;
 const height = 512;

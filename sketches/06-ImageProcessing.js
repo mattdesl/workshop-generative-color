@@ -6,7 +6,7 @@ import * as random from "../lib/random.js";
 import { mapRange } from "../lib/math.js";
 
 imagePixels({
-  url: "/sketches/images/gonz-ddl-nO2sfLUaxgg-unsplash.jpg",
+  url: "/assets/images/gonz-ddl-nO2sfLUaxgg-unsplash.jpg",
   maxSize: 300,
   process: (color, u, v) => {
     const out = new Color(color);

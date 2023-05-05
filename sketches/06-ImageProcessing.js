@@ -7,7 +7,7 @@ import { mapRange } from "../lib/math.js";
 
 imagePixels({
   url: "/sketches/images/gonz-ddl-nO2sfLUaxgg-unsplash.jpg",
-  maxSize: 340,
+  maxSize: 300,
   process: (color, u, v) => {
     const out = new Color(color);
 

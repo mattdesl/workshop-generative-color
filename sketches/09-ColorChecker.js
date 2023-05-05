@@ -29,14 +29,6 @@ const expected = spectra.ColorChecker;
 for (let i = 0; i < data.length; i++) {
   const spec = data[i];
   const xyz_d65 = spectra.spectra_to_XYZ(spec, spectra.illuminant_d65);
-  const xyz_c = spectra.spectra_to_XYZ(spec, spectra.illuminant_c);
-  const cie_xyY = spectra.xyz_to_xyY(xyz_c);
-  console.log(
-    "data",
-    cie_xyY.map((x) => parseFloat(x.toFixed(3))),
-    expected
-  );
-
   const rgb = spectra.XYZ_to_sRGB(xyz_d65);
   const x = Math.floor(i % cols);
   const y = Math.floor(i / cols);

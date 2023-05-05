@@ -56,9 +56,8 @@ for (let i = 0; i < count; i++) {
 // sort by luminance
 shapes.sort((a, b) => a.Y - b.Y);
 
-let bgSpec = bright.map((x) => x * 1.04);
-let rgb = spectra.spectra_to_sRGB(bgSpec);
-
+const bgSpec = bright.map((x) => x * 1.04);
+const rgb = spectra.spectra_to_sRGB(bgSpec);
 const color = `rgb(${rgb.join(",")})`;
 context.fillStyle = color;
 context.fillRect(0, 0, width, height);
@@ -74,25 +73,5 @@ shapes.forEach((shape) => {
   context.fillRect(shape.x, shape.y, shape.width, shape.height);
   context.strokeRect(shape.x, shape.y, shape.width, shape.height);
 });
-
-// let columns = 6;
-// let rows = columns;
-// const tileSize = width / columns;
-
-// for (let y = 0, c = 0; y < rows; y++) {
-//   for (let x = 0; x < columns; x++, c++) {
-//     if (c >= palette.length) continue;
-
-//     // get U coordinates between 0..1 for the X axis
-//     const u = columns <= 1 ? 0.5 : x / (columns - 1);
-//     const v = rows <= 1 ? 0.5 : y / (rows - 1);
-
-//     const pigment = palette[c];
-
-// const rgb = spectra.spectra_to_sRGB(pigment);
-// context.fillStyle = `rgb(${rgb.join(",")})`;
-//     context.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-//   }
-// }
 
 document.body.appendChild(canvas);

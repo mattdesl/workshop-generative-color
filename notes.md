@@ -25,3 +25,5 @@ bucography-r7eBv7pnP2E-unsplash.jpg
 - https://147colors.com
 - https://colorsupplyyy.com/app/
 - https://enes.in/sorted-colors/
+- https://www.colorsystem.com/?lang=en
+- https://keithjgrant.com/posts/2023/04/its-time-to-learn-oklch-color/

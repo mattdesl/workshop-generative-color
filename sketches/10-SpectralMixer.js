@@ -12,7 +12,7 @@ import macbeth from "../lib/spectra/macbeth.js";
 import { mix as spectralJSMix } from "../lib/spectral.js";
 
 const width = 1024;
-const height = 1024;
+const height = 512;
 
 const { canvas, context } = createCanvas({
   width,

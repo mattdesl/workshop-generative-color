@@ -1,12 +1,10 @@
 import { App } from "@tinyhttp/app";
 import sirv from "sirv";
 import * as http from "http";
-import WebSocket from "ws";
+import { WebSocket, WebSocketServer } from "ws";
 
 export const LIVE_RELOAD_API = "/livereload";
 export const LIVE_RELOAD_SRC = "/livereload.js";
-
-const WebSocketServer = WebSocket.Server;
 
 const liveReloadClient = `window.onload = () => {
   let socket;

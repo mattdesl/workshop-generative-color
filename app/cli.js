@@ -12,7 +12,7 @@ const useWatch = true;
 
 const SERVE_DIR = path.resolve(__dirname, "../");
 const SKETCHES_DIR = path.resolve(__dirname, "../sketches/");
-const WATCH_DIRS = ["app/client", "assets", "lib", "sketches"].map((w) =>
+const WATCH_DIRS = ["assets", "lib", "sketches"].map((w) =>
   path.resolve(__dirname, "..", w)
 );
 
@@ -30,7 +30,11 @@ const app = await createServer({
 if (useWatch) {
   const subscriptions = [];
   for (let dir of WATCH_DIRS) {
-    subscriptions.push(await watcher.subscribe(dir, app.reload));
+    try {
+      subscriptions.push(await watcher.subscribe(dir, app.reload));
+    } catch (err) {
+      console.warn("Watch Error:", err);
+    }
   }
 }
 

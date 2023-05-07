@@ -36,7 +36,7 @@ for (let x = 0; x < columns; x++) {
 
   const color = colorA.clone();
 
-  // interpolate in linear space!
+  // interpolate in linear space
   // color.srgb_linear = lerpArray(colorA.srgb_linear, colorB.srgb_linear, u);
 
   // or in LAB

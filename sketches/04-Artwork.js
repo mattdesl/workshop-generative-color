@@ -1,10 +1,7 @@
 // Exercise: Apply a procedural palette to an artwork
-
 import { Color } from "../lib/color.js";
 import * as random from "../lib/random.js";
-
-import sketch from "../lib/sketches/grid.js";
-import { visualize } from "../lib/test.js";
+import visualize from "../lib/sketches/visualize.js";
 
 // create our color palette
 let palette = [];
@@ -21,11 +18,15 @@ palette.push(new Color("lch", [20, 150, hue + 45]));
 // choose a fixed background
 const background = new Color("lch", [90, 5, 60]);
 
-visualize(palette, sketch, {
-  dimensions: [2048, 2048],
-  data: {
-    background,
-    columns: 4,
-    rows: 4,
-  },
+// visualize our palette to a canvas
+const size = 1024;
+const canvas = visualize({
+  palette,
+  background,
+  size,
+  tiles: 4,
+  // tilePadding: (0.1 * size) / 2,
+  // margin: 0.1 * size,
 });
+
+document.body.appendChild(canvas);

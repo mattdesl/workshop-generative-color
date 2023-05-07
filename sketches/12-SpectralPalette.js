@@ -8,7 +8,7 @@ import { lerpArray, mapRange } from "../lib/math.js";
 import { createCanvas } from "../lib/util.js";
 import * as spectra from "../lib/spectra/spectra.js";
 import { xyz2rgb, rgb2xyz } from "../lib/spectra/xyz.js";
-import macbeth from "../lib/spectra/macbeth.js";
+import ColorChecker from "../lib/spectra/colorchecker.js";
 
 const aspect = 1.414;
 const width = 1024;
@@ -22,17 +22,16 @@ const { canvas, context } = createCanvas({
 
 random.setSeed("" || random.getRandomHash());
 
-// console.log(random.rangeFloor(0, macbeth.length));
-// console.log(random.rangeFloor(0, macbeth.length));
-const primaries = random.shuffle(macbeth).slice(0, 6);
-const bright = macbeth[18];
-const dark = macbeth[macbeth.length - 1];
+const ColorCheckerSPD = ColorChecker.map((c) => c.spd);
+
+const primaries = random.shuffle(ColorCheckerSPD).slice(0, 6);
+const bright = ColorCheckerSPD[18];
+const dark = ColorCheckerSPD[ColorCheckerSPD.length - 1];
 
 function procPigment() {
   const [a, b] = random.shuffle(primaries);
   let c = spectra.mix_spectra(a, b, random.pick([0, 0.25, 0.5, 0.75, 1]));
   c = spectra.mix_spectra(c, dark, random.range(0, 0.2)); // tint dark
-  c = spectra.mix_spectra(c, bright, random.range(0, 1)); // tint bright
   return c;
 }
 

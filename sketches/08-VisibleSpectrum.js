@@ -3,22 +3,9 @@
 // import Color from "https://colorjs.io/dist/color.js";
 // import { imagePixels } from "../lib/test.js";
 
-import * as random from "../lib/random.js";
-import { clamp01, mapRange, lerp } from "../lib/math.js";
 import { createCanvas } from "../lib/util.js";
-import {
-  illuminant_d65,
-  spectra_to_sRGB,
-  spectra_to_XYZ,
-  sRGB_to_spectra,
-  WAVELENGTH_COUNT,
-  WAVELENGTH_MAX,
-  WAVELENGTH_MIN,
-  wavelength_to_sRGB,
-  wavelength_to_XYZ,
-  XYZ_to_sRGB,
-} from "../lib/spectra/spectra.js";
-import macbeth from "../lib/spectra/macbeth.js";
+import { wavelength_to_sRGB } from "../lib/spectra/spectra.js";
+import { lerp } from "../lib/math.js";
 
 const width = 1024;
 const height = 256;
@@ -26,8 +13,6 @@ const height = 256;
 const { canvas, context } = createCanvas({
   width,
   height,
-  // Tip: Uncomment to use P3 colors
-  // colorSpace: "display-p3",
 });
 
 const steps = width;

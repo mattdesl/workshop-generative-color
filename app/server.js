@@ -100,6 +100,7 @@ export async function createServer(opts = {}) {
   app.use(
     sirv(serveDir, {
       dev: true,
+      etag: false,
     })
   );
 

@@ -7,7 +7,8 @@ import * as random from "../lib/random.js";
 import { lerpArray, mapRange } from "../lib/math.js";
 import { createCanvas } from "../lib/util.js";
 import * as spectra from "../lib/spectra/spectra.js";
-import macbeth from "../lib/spectra/macbeth.js";
+import ColorChecker from "../lib/spectra/colorchecker.js";
+import { Color, colorToStyle } from "../lib/color.js";
 
 const width = 1024;
 const height = 512;
@@ -15,19 +16,18 @@ const height = 512;
 const { canvas, context } = createCanvas({
   width,
   height,
-  // Tip: Uncomment to use P3 colors
-  // colorSpace: "display-p3",
 });
 
 random.setSeed("" || random.getRandomHash());
 console.log(random.getSeed());
 
-// console.log(random.rangeFloor(0, macbeth.length));
-// console.log(random.rangeFloor(0, macbeth.length));
-const [a, b] = random.shuffle(macbeth);
+const [A, B] = random.shuffle(ColorChecker);
 
 // a good example
-// const [a, b] = [macbeth[12], macbeth[15]];
+// const [A, B] = [ColorChecker[12], ColorChecker[15]];
+
+const a = A.spd;
+const b = B.spd;
 
 const lRGB0 = spectra.XYZ_to_linearRGB(spectra.spectra_to_XYZ(a));
 const lRGB1 = spectra.XYZ_to_linearRGB(spectra.spectra_to_XYZ(b));
@@ -39,6 +39,7 @@ for (let i = 0; i < steps; i++) {
   const sliceWidth = Math.round((1 / steps) * width);
   const u = i / (steps - 1);
   const c = spectra.mix_spectra(a, b, u);
+
   let outColor = spectra.spectra_to_sRGB(c);
   context.fillStyle = context.strokeStyle = `rgb(${outColor.join(",")})`;
   context.fillRect(sliceWidth * i, 0, sliceWidth, height / 2);

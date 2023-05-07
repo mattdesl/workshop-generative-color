@@ -1,16 +1,8 @@
-// Exercise: Use color science to process images
-
-// import Color from "https://colorjs.io/dist/color.js";
-// import { imagePixels } from "../lib/test.js";
-
-import * as random from "../lib/random.js";
-import { mapRange } from "../lib/math.js";
 import { createCanvas } from "../lib/util.js";
 import * as spectra from "../lib/spectra/spectra.js";
-import { xyz2rgb, rgb2xyz } from "../lib/spectra/xyz.js";
-import macbeth from "../lib/spectra/macbeth.js";
+import ColorChecker from "../lib/spectra/colorchecker.js";
 
-const width = 256;
+const width = 680;
 const cols = 6;
 const rows = 4;
 const tileWidth = width / cols;
@@ -20,15 +12,11 @@ const height = rows * tileHeight;
 const { canvas, context } = createCanvas({
   width,
   height,
-  // Tip: Uncomment to use P3 colors
-  // colorSpace: "display-p3",
 });
 
-const data = macbeth;
-const expected = spectra.ColorChecker;
-for (let i = 0; i < data.length; i++) {
-  const spec = data[i];
-  const xyz_d65 = spectra.spectra_to_XYZ(spec, spectra.illuminant_d65);
+for (let i = 0; i < ColorChecker.length; i++) {
+  const spd = ColorChecker[i].spd;
+  const xyz_d65 = spectra.spectra_to_XYZ(spd, spectra.illuminant_d65);
   const rgb = spectra.XYZ_to_sRGB(xyz_d65);
   const x = Math.floor(i % cols);
   const y = Math.floor(i / cols);
@@ -40,13 +28,23 @@ for (let i = 0; i < data.length; i++) {
     tileWidth,
     Math.ceil(tileHeight / 2)
   );
-  context.fillStyle = expected[i][1];
+  context.fillStyle = ColorChecker[i].hex;
   context.fillRect(
     x * tileWidth,
     y * tileHeight + Math.floor(tileHeight / 2),
     tileWidth,
     Math.ceil(tileHeight / 2)
   );
+
+  context.fillStyle = "white";
+  context.font = "12px monospace";
+  context.globalCompositeOperation = "difference";
+  context.fillText(
+    ColorChecker[i].name,
+    x * tileWidth + 10,
+    y * tileHeight + 10 + Math.floor(tileHeight / 2)
+  );
+  context.globalCompositeOperation = "source-over";
 }
 
 document.body.appendChild(canvas);

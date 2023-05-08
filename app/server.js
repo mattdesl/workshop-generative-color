@@ -2,6 +2,7 @@ import { App } from "@tinyhttp/app";
 import sirv from "sirv";
 import * as http from "http";
 import { WebSocket, WebSocketServer } from "ws";
+import { parse as parseUrl } from "url";
 
 export const LIVE_RELOAD_API = "/livereload";
 export const LIVE_RELOAD_SRC = "/livereload.js";
@@ -10,7 +11,8 @@ const liveReloadClient = `window.onload = () => {
   let socket;
   retry();
   function retry() {
-    const uri = "ws://" + window.location.host + "/livereload";
+    const protocol = /^https\:$/i.test(window.location.protocol) ? 'wss' : 'ws';
+    const uri = protocol + "://" + window.location.host + "/livereload";
     socket = new WebSocket(uri);
     socket.onmessage = (m) => {
       let evt;
@@ -49,7 +51,7 @@ const tinyws =
   };
 
 export async function createServer(opts = {}) {
-  const { serveDir = process.cwd(), middleware } = opts;
+  const { serveDir = process.cwd(), middleware, env } = opts;
 
   const clients = new Set();
   const app = new App({
@@ -97,12 +99,29 @@ export async function createServer(opts = {}) {
   if (middleware) {
     app.use(middleware);
   }
-  app.use(
-    sirv(serveDir, {
-      dev: true,
-      etag: false,
-    })
-  );
+
+  const serveDev = sirv(serveDir, {
+    dev: true,
+    etag: false,
+  });
+
+  if (env === "glitch") {
+    const serveProd = sirv(serveDir, {
+      dev: false,
+      etag: true,
+      maxAge: 60 * 60, // 1H
+      immutable: true,
+    });
+    app.use((req, res, next) => {
+      if (parseUrl(req.url).pathname.includes("/sketches")) {
+        return serveDev(req, res, next);
+      } else {
+        return serveProd(req, res, next);
+      }
+    });
+  } else {
+    app.use(serveDev);
+  }
 
   return {
     reload() {

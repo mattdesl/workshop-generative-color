@@ -1,7 +1,7 @@
 // Exercise: Apply a procedural palette to an artwork
 import { Color } from "../lib/color.js";
 import * as random from "../lib/random.js";
-import visualize from "../lib/sketches/visualize.js";
+import visualize from "../lib/visualize.js";
 
 // create our color palette
 let palette = [];

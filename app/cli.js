@@ -16,36 +16,42 @@ const WATCH_DIRS = ["assets", "lib", "sketches"].map((w) =>
   path.resolve(__dirname, "..", w)
 );
 
-// use local host
 const DEFAULT_PORT = process.env.PORT || 9966;
-const host = undefined;
-const port = await getPort(DEFAULT_PORT, host);
 
-const app = await createServer({
-  title: "color",
-  serveDir: SERVE_DIR,
-  middleware,
-});
+start();
 
-if (useWatch) {
-  const subscriptions = [];
-  for (let dir of WATCH_DIRS) {
-    try {
-      subscriptions.push(await watcher.subscribe(dir, app.reload));
-    } catch (err) {
-      console.warn("Watch Error:", err);
+async function start() {
+  // use local host
+  const host = undefined;
+  const port = await getPort(DEFAULT_PORT, host);
+
+  const app = await createServer({
+    title: "color",
+    env: "local",
+    serveDir: SERVE_DIR,
+    middleware,
+  });
+
+  if (useWatch) {
+    const subscriptions = [];
+    for (let dir of WATCH_DIRS) {
+      try {
+        subscriptions.push(await watcher.subscribe(dir, app.reload));
+      } catch (err) {
+        console.warn("Watch Error:", err);
+      }
     }
   }
+
+  await app.listen(port, host);
+
+  const addresses = ["localhost", ...localhosts];
+  console.log(
+    `Server listening on:\n` +
+      [...addresses].map((host) => `  http://${host}:${port}/`).join("\n")
+  );
+  console.log();
 }
-
-await app.listen(port, host);
-
-const addresses = ["localhost", ...localhosts];
-console.log(
-  `Server listening on:\n` +
-    [...addresses].map((host) => `  http://${host}:${port}/`).join("\n")
-);
-console.log();
 
 async function middleware(req, res, next) {
   const url = parseUrl(req.url).pathname;
@@ -74,7 +80,9 @@ async function index(req, res, next) {
     .map(
       (f) =>
         `<div class='entry'>
-          <a href="${encodeURI("/view/" + f)}">${f}</a>
+          <a href="${encodeURI(
+            "/view/" + path.basename(f, path.extname(f))
+          )}">${f}</a>
         </div>`
     )
     .join("");

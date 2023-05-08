@@ -15,7 +15,7 @@ const { canvas, context } = createCanvas({
   height,
 });
 
-const data = random.pick(ColorChecker);
+const data = ColorChecker[1]; //random.pick(ColorChecker);
 const spd = data.spd;
 const outColor = spectra_to_sRGB(spd);
 context.fillStyle = context.strokeStyle = `rgb(${outColor.join(",")})`;

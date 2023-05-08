@@ -16,9 +16,6 @@
   "scripts": {
     "start": "node app/cli.js"
   },
-  "engines": {
-    "node": "10.x"
-  },
   "keywords": [],
   "author": "Matt DesLauriers",
   "license": "ISC"

@@ -9,7 +9,7 @@ You can see and edit the demos online in Glitch if you do not want to run it loc
 
 ## Running Locally
 
-To run locally, you first need to clone and install the project Node.js and npm, on new version with ES module support (I am using Node 19).
+To run locally, you first need to clone and install the project with Node.js and npm, and it will need to be a newer version like `node@16` or higher. You can download Node.js and npm [here](https://nodejs.org).
 
 In terminal, run the following from your desired root folder:
 
@@ -28,6 +28,12 @@ npm run start
 ```
 
 Open [http://localhost:9966/](http://localhost:9966/) and start changing exercises in the [sketches/](./sketches/) folder.
+
+## Code & Software
+
+- [colorjs.io](https://colorjs.io)
+- [spectral.js](https://github.com/rvanwijnen/spectral.js)
+- [mixbox](https://github.com/scrtwpns/mixbox)
 
 ## Tools
 
@@ -49,12 +55,6 @@ Open [http://localhost:9966/](http://localhost:9966/) and start changing exercis
 - [Sorted CSS Colors](https://enes.in/sorted-colors/)
 - [Color Systems](https://www.colorsystem.com/?lang=en)
 - ["It's Time to Learn oklch Color" by Keith J. Grant](https://keithjgrant.com/posts/2023/04/its-time-to-learn-oklch-color/)
-
-## Code & Software
-
-- [colorjs.io](https://colorjs.io)
-- [spectral.js](https://github.com/rvanwijnen/spectral.js)
-- [mixbox](https://github.com/scrtwpns/mixbox)
 
 ## Color Libraries
 

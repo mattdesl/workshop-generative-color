@@ -4,10 +4,8 @@
 // import { imagePixels } from "../lib/test.js";
 
 import * as random from "../lib/random.js";
-import { lerpArray, mapRange } from "../lib/math.js";
 import { createCanvas } from "../lib/util.js";
 import * as spectra from "../lib/spectra/spectra.js";
-import { xyz2rgb, rgb2xyz } from "../lib/spectra/xyz.js";
 import ColorChecker from "../lib/spectra/colorchecker.js";
 
 const aspect = 1.414;

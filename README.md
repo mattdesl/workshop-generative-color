@@ -43,7 +43,7 @@ Open [http://localhost:9966/](http://localhost:9966/) and start changing exercis
 
 ## Color Pickers
 
-- [Google HSL Color Picker](https://g.co/kgs/xoe6Sv)
+- [Google HSV Color Picker](https://g.co/kgs/xoe6Sv)
 - [OKLCH and LCH Color Picker](https://oklch.com/)
 - [OKHSV and OKHSL Color Picker](https://ok-color-picker.netlify.app/) (related [blog post](https://bottosson.github.io/posts/colorpicker/))
 - [HSLuv](https://www.hsluv.org)
